@@ -15,9 +15,6 @@ import 'screens.dart';
 import 'utils.dart' as utils;
 
 class ImageProcessor {
-  static const _kDefaultIosBackground = 'xc:none';
-  @visibleForTesting // for now
-  static const kDefaultAndroidBackground = 'xc:none'; // transparent
   static const _kCrop = '1000x40+0+0'; // default sample size and location to test for brightness
 
   final Screens _screens;
@@ -272,7 +269,12 @@ class ImageProcessor {
   ///
   /// Resulting image is scaled to fit dimensions required by stores.
   static Future<void> frame(
-      String tmpDir, Map screen, String screenshotPath, DeviceType deviceType, RunMode? runMode) async {
+    String tmpDir,
+    Map screen,
+    String screenshotPath,
+    DeviceType deviceType,
+    RunMode? runMode,
+  ) async {
     final Map resources = screen['resources'];
 
     final framePath = tmpDir + '/' + resources['frame'];
@@ -280,20 +282,26 @@ class ImageProcessor {
     final resize = screen['resize'];
     final offset = screen['offset'];
 
-    // set the default background color
-    String backgroundColor;
-    (deviceType == DeviceType.ios && runMode != RunMode.archive)
-        ? backgroundColor = _kDefaultIosBackground
-        : backgroundColor = kDefaultAndroidBackground;
-
     im.frame(
       imagePath: screenshotPath,
       size: size,
-      backgroundColor: backgroundColor,
+      // transparent
+      backgroundColor: 'xc:none',
       resize: resize,
       offset: offset,
       framePath: framePath,
       destinationPath: screenshotPath,
     );
+
+    if (resources.containsKey('mask')) {
+      final maskPath = tmpDir + '/' + resources['mask'];
+
+      im.mask(
+        imagePath: screenshotPath,
+        maskPath: maskPath,
+        maskResize: resize,
+        destinationPath: screenshotPath,
+      );
+    }
   }
 }

@@ -99,7 +99,7 @@ class ImageMagick {
     required String framePath,
     required String destinationPath,
   }) {
-    //  convert -size $size xc:skyblue \
+    //  convert -size $size xc:none \
 //   \( "$frameFile" -resize $resize \) -gravity center -composite \
 //   \( final_screenshot.png -resize $resize \) -gravity center -geometry -4-9 -composite \
 //   framed.png
@@ -132,11 +132,39 @@ class ImageMagick {
     );
   }
 
+  void mask({
+    required String imagePath,
+    required String maskPath,
+    required String? maskResize,
+    required String destinationPath,
+  }) {
+    //  convert in.png -matte \( mask.png -resize <mask_resize> \) -gravity center -compose DstIn -composite out.png
+    _imageMagickCmd(
+      'convert',
+      [
+        imagePath,
+        '-matte',
+        if (maskResize != null) ...[
+          '(',
+          maskPath,
+          '-resize',
+          maskResize,
+          ')',
+        ] else maskPath,
+        '-gravity',
+        'center',
+        '-compose',
+        'DstIn',
+        '-composite',
+        destinationPath,
+      ],
+    );
+  }
+
   /// Checks if brightness of sample of image exceeds a threshold.
   /// Section is specified by [cropSizeOffset] which is of the form
   /// cropSizeOffset, eg, '1242x42+0+0'.
-  bool isThresholdExceeded(String imagePath, String cropSizeOffset,
-      [double threshold = _kThreshold]) {
+  bool isThresholdExceeded(String imagePath, String cropSizeOffset, [double threshold = _kThreshold]) {
     //convert logo.png -crop $crop_size$offset +repage -colorspace gray -format "%[fx:(mean>$threshold)?1:0]" info:
     final result = cmd(_getPlatformCmd('convert', <String>[
       imagePath,
@@ -156,8 +184,7 @@ class ImageMagick {
   bool compare(String comparisonImage, String recordedImage) {
     final diffImage = getDiffImagePath(comparisonImage);
 
-    var returnCode = _imageMagickCmd('compare',
-        <String>['-metric', 'mae', recordedImage, comparisonImage, diffImage]);
+    var returnCode = _imageMagickCmd('compare', <String>['-metric', 'mae', recordedImage, comparisonImage, diffImage]);
 
     if (returnCode == 0) {
       // delete no-diff diff image created by image magick
@@ -168,11 +195,8 @@ class ImageMagick {
 
   /// Append diff suffix [kDiffSuffix] to [imagePath].
   String getDiffImagePath(String imagePath) {
-    final diffName = p.dirname(imagePath) +
-        '/' +
-        p.basenameWithoutExtension(imagePath) +
-        kDiffSuffix +
-        p.extension(imagePath);
+    final diffName =
+        p.dirname(imagePath) + '/' + p.basenameWithoutExtension(imagePath) + kDiffSuffix + p.extension(imagePath);
     return diffName;
   }
 
@@ -180,8 +204,7 @@ class ImageMagick {
     fs
         .directory(dirPath)
         .listSync()
-        .where((fileSysEntity) =>
-            p.basename(fileSysEntity.path).contains(kDiffSuffix))
+        .where((fileSysEntity) => p.basename(fileSysEntity.path).contains(kDiffSuffix))
         .forEach((diffImage) => fs.file(diffImage.path).deleteSync());
   }
 
@@ -213,10 +236,7 @@ class ImageMagick {
 Future<bool> isImageMagicInstalled() async {
   try {
     return await runInContext<bool>(() {
-      return runCmd(platform.isWindows
-              ? ['magick', '-version']
-              : ['convert', '-version']) ==
-          0;
+      return runCmd(platform.isWindows ? ['magick', '-version'] : ['convert', '-version']) == 0;
     });
   } catch (e) {
     return false;
