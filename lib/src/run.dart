@@ -302,7 +302,7 @@ class Screenshots {
     Screens screens,
   ) async {
     for (final testPath in config.tests) {
-      final command = <String?>['flutter', '-d', deviceId, 'drive', '--no-sound-null-safety'];
+      final command = <String?>['flutter', '-d', deviceId, 'drive'];
       bool? _isBuild() => isBuild ?? config.getDevice(configDeviceName).isBuild;
       if (!_isBuild()!) {
         command.add('--no-build');

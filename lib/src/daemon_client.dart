@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:meta/meta.dart';

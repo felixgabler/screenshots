@@ -146,7 +146,7 @@ bool isEmulatorInstalled(List<DaemonEmulator> emulators, String deviceName) {
     final matchingEmulators = emulators.where((emulator) => emulator.name == deviceName);
     if (matchingEmulators.length > 1) {
       printStatus('Warning: \'$deviceName\' has multiple avd versions.');
-      printStatus('       : Using \'$deviceName\' with avd version ${emulator!.id}.');
+      printStatus('       : Using \'$deviceName\' with avd version ${emulator.id}.');
     }
   }
   return isEmulatorInstalled;
