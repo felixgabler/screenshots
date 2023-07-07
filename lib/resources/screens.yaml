@@ -45,7 +45,7 @@ ios:
   #  6.1inch:
   #    devices:
   #      - iPhone XR
-  6.5inch:
+  6.5inchOld:
     size: 1242x2688
     resize: 87%
     resources:
@@ -62,6 +62,25 @@ ios:
       - iPhone Xs Max
       - iPhone 11 Pro Max
       - iPhone 12 Pro Max
+  6.5inch:
+    size: 1290x2796
+    # resize controls how much space of the whole image is filled with frame and screenshot (i.e., padding around it)
+    resize: 90.9%
+    resources:
+      navbar: resources/ios/6.5inch/navbar_black_rounded.png
+      navbar black: resources/ios/6.5inch/navbar_black_rounded.png
+      navbar white: resources/ios/6.5inch/navbar_light_gray_rounded.png
+      statusbar: resources/ios/6.5inch/statusbar_white.png
+      statusbar black: resources/ios/6.5inch/statusbar_black.png
+      statusbar white: resources/ios/6.5inch/statusbar_white.png
+      frame: resources/ios/phones/iPhone_14_Pro_Max_Space_Black.png
+      # Provide a mask to cut the screenshot to the frame (otherwise there can be overlap with rounded corners)
+      # For some reason, the resize needs to be different for the mask than for the frame
+      # Test it with `convert in.png -matte \( mask.png -resize <mask_resize> \) -gravity center -compose DstIn -composite out.png`
+      mask: resources/ios/phones/iPhone_14_Pro_Max_mask.png
+    offset: -0-2
+    devices:
+      - iPhone 14 Pro Max
   #  7.9inches:
   #    devices:
   #      - iPad Mini
