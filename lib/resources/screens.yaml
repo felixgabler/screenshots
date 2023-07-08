@@ -129,6 +129,8 @@ ios:
     devices:
       - iPad Pro (12.9-inch) (3rd generation)
       - iPad Pro (12.9-inch) (4th generation)
+      - iPad Pro (12.9-inch) (5th generation)
+      - iPad Pro (12.9-inch) (6th generation)
 android:
   5.2inch:
     size: 1080x1920
