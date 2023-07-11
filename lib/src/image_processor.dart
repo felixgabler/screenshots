@@ -54,48 +54,48 @@ class ImageProcessor {
       if (screenProps == null) {
         printStatus('Warning: \'$deviceName\' images will not be processed');
       } else {
-        // add frame if required
-        if (_config.isFrameRequired(deviceName, orientation)) {
-          final Map screenResources = screenProps['resources'];
-          final status = logger?.startProgress(
-            'Processing screenshots from test...',
-            timeout: Duration(minutes: 4),
+        final Map screenResources = screenProps['resources'];
+        final status = logger?.startProgress(
+          'Processing screenshots from test...',
+          timeout: Duration(minutes: 4),
+        );
+
+        // unpack images for screen from package to local tmpDir area
+        await resources.unpackImages(screenResources, _config.stagingDir);
+
+        // add status and nav bar for each screenshot
+        if (unframedScreenshotPaths.isEmpty) {
+          printStatus('Warning: no screenshots found in $unframedScreenshotsDir');
+        }
+
+        for (final screenshotPath in unframedScreenshotPaths) {
+          // enforce correct size and add background if necessary
+          addBackgroundIfRequired(
+            screenProps,
+            screenshotPath.path,
           );
 
-          // unpack images for screen from package to local tmpDir area
-          await resources.unpackImages(screenResources, _config.stagingDir);
+          // add status bar for each screenshot
+          await overlayStatusbar(
+            _config.stagingDir!,
+            screenResources,
+            screenProps,
+            screenshotPath.path,
+          );
 
-          // add status and nav bar for each screenshot
-          if (unframedScreenshotPaths.isEmpty) {
-            printStatus('Warning: no screenshots found in $unframedScreenshotsDir');
-          }
-
-          for (final screenshotPath in unframedScreenshotPaths) {
-            // enforce correct size and add background if necessary
-            addBackgroundIfRequired(
-              screenProps,
-              screenshotPath.path,
-            );
-
-            // add status bar for each screenshot
-            await overlayStatusbar(
+          if (_config.isNavbarRequired(deviceName, orientation)) {
+            // add nav bar for each screenshot
+            await overlayNavbar(
               _config.stagingDir!,
               screenResources,
-              screenProps,
               screenshotPath.path,
+              deviceType,
             );
-
-            if (_config.isNavbarRequired(deviceName, orientation)) {
-              // add nav bar for each screenshot
-              await overlayNavbar(
-                _config.stagingDir!,
-                screenResources,
-                screenshotPath.path,
-                deviceType,
-              );
-            }
           }
+        }
 
+        // add frame if required
+        if (_config.isFrameRequired(deviceName, orientation)) {
           // copy unframed screenshots before framing them
           utils.copyFiles(unframedScreenshotsDir, framedScreenshotsDir);
 
