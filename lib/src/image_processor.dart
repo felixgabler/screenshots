@@ -113,7 +113,7 @@ class ImageProcessor {
 
           status?.stop();
         } else {
-          printStatus('Warning: framing is not enabled');
+          printStatus('Info: framing is not enabled');
         }
       }
 
@@ -123,13 +123,16 @@ class ImageProcessor {
         var dstDir = fastlane.getDirPath(deviceType, lang, androidModelType, framed: true);
         runMode == RunMode.recording ? dstDir = '${_config.recordingDir}/$dstDir' : null;
         runMode == RunMode.archive ? dstDir = archive!.dstDir(deviceType, lang) : null;
-        // prefix screenshots with name of device before moving
-        // (useful for uploading to apple via fastlane)
-        await utils.prefixFilesInDir(framedScreenshotsDir,
-            '$deviceName-${orientation == null ? kDefaultOrientation : utils.getStringFromEnum(orientation)}-');
 
-        printStatus('Moving framed screenshots to $dstDir');
-        utils.moveFiles(framedScreenshotsDir, dstDir);
+        if (_config.isFrameRequired(deviceName, orientation)) {
+          // prefix screenshots with name of device before moving
+          // (useful for uploading to apple via fastlane)
+          await utils.prefixFilesInDir(framedScreenshotsDir,
+              '$deviceName-${orientation == null ? kDefaultOrientation : utils.getStringFromEnum(orientation)}-');
+
+          printStatus('Moving framed screenshots to $dstDir');
+          utils.moveFiles(framedScreenshotsDir, dstDir);
+        }
 
         if (runMode == RunMode.comparison) {
           final recordingDir = '${_config.recordingDir}/$dstDir';
