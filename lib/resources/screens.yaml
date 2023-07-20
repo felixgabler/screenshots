@@ -174,7 +174,7 @@ android:
       navbar white: resources/android/1440/samsung_navbar_white.png
       frame: resources/android/phones/Samsung_Galaxy_S20.png
     offset: +8+6
-    statusbar offset: '+27'
+    statusbar offset: '+14'
     destName: phone
     devices:
       - Samsung Galaxy S20
